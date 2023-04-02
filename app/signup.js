@@ -5,19 +5,27 @@ import { CustomButton, CustomInput } from '../components'
 import { styles } from "./signin"
 import { useRouter } from "expo-router"
 import SocialBtns from "../components/SocialBtns"
+import { useForm } from "react-hook-form"
 
 
 const Signup = () => {
+    const { handleSubmit, control, watch } = useForm({
+        defaultValues: {
+            username: "",
+            email: "",
+            password: "",
+            confirmPassword: ""
+        }
+    })
 
-    const [userName, setUserName] = useState("")
-    const [email, setEmail] = useState("")
-    const [password, setPassword] = useState("")
-    const [passwordRepeat, setPasswordRepeat] = useState("")
     const route = useRouter()
 
+    const password = watch("password")
 
-    const handleSignUpWithEmailAndPasswordPressed = useCallback(async () => {
-        console.warn("logged in")
+
+
+    const handleSignUpWithEmailAndPasswordPressed = useCallback(async (data) => {
+        console.warn("logged in", data)
     }, [])
 
 
@@ -28,12 +36,17 @@ const Signup = () => {
 
     return (
         <ScrollView style={styles.root} contentContainerStyle={{ alignItems: "center", paddingBottom: 25 }}>
-            <CustomInput placeholder="username" value={userName} setValue={setUserName} />
-            <CustomInput placeholder="enter email" value={email} setValue={setEmail} />
-            <CustomInput placeholder="enter password" value={password} setValue={setPassword} secureTextEntry={true} />
-            <CustomInput placeholder="repeat password" value={passwordRepeat} setValue={setPasswordRepeat} secureTextEntry={true} />
+            <CustomInput rules={{ required: "This field is required." }} control={control} placeholder="username" name="username" />
+            <CustomInput rules={{
+                required: "This field is required.", pattern: {
+                    value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$/i,
+                    message: 'Enter a valid e-mail address',
+                }
+            }} control={control} placeholder="enter email" name="email" />
+            <CustomInput rules={{ required: "This field is required." }} control={control} placeholder="enter password" name="password" secureTextEntry={true} />
+            <CustomInput rules={{ validate: value => value === password || "password do not match" }} control={control} placeholder="repeat password" name="confirmPassword" secureTextEntry={true} />
 
-            <CustomButton title="Create Account" onPress={handleSignUpWithEmailAndPasswordPressed} />
+            <CustomButton title="Create Account" onPress={handleSubmit(handleSignUpWithEmailAndPasswordPressed)} />
 
             <Text style={{ marginBottom: 30 }}>By registering you accept our terms and conditions</Text>
 
