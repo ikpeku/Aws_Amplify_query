@@ -1,9 +1,9 @@
 import { StyleSheet, Text, Pressable } from 'react-native'
 import React from 'react'
 
-const CustomBUtton = ({title, onPress, type="Primary", bg, fc}) => {
+const CustomBUtton = ({title, onPress, type="Primary", bg, fc, disabled}) => {
   return (
-    <Pressable onPress={onPress} style={[styles.root, styles[`root_${type}`], bg ? {backgroundColor: bg} : {}]}>
+    <Pressable disabled={disabled} onPress={onPress} style={[styles.root, styles[`root_${type}`], bg ? {backgroundColor: bg} : {}]}>
       <Text style={[styles.text, fc ? {color: fc} : {} ]}>{title}</Text>
     </Pressable>
   )

@@ -6,6 +6,7 @@
     "web": "expo start --web"
   },
   "dependencies": {
+    "@hookform/error-message": "^2.0.1",
     "@react-native-async-storage/async-storage": "1.17.11",
     "@react-native-community/netinfo": "^9.3.7",
     "amazon-cognito-identity-js": "^6.1.2",

@@ -1,16 +1,18 @@
 
 import { useCallback, useState } from "react"
-import { ScrollView, Text } from 'react-native'
+import { Alert, ScrollView, Text } from 'react-native'
 import { CustomButton, CustomInput } from '../components'
 import { styles } from "./signin"
 import { useRouter } from "expo-router"
 import SocialBtns from "../components/SocialBtns"
 import { useForm } from "react-hook-form"
+import { Auth } from "aws-amplify"
 
 
 const Signup = () => {
     const { handleSubmit, control, watch } = useForm({
         defaultValues: {
+            fullname: "",
             username: "",
             email: "",
             password: "",
@@ -25,7 +27,13 @@ const Signup = () => {
 
 
     const handleSignUpWithEmailAndPasswordPressed = useCallback(async (data) => {
-        console.warn("logged in", data)
+
+        try {
+            await Auth.signUp({ username: data.username, password: data.password, attributes: { email: data.email, name: data.fullname, preferred_username: data.username } })
+            route.push("confirmSignup", { username: data.username })
+        } catch (error) {
+            Alert.alert(error.message)
+        }
     }, [])
 
 
@@ -36,6 +44,7 @@ const Signup = () => {
 
     return (
         <ScrollView style={styles.root} contentContainerStyle={{ alignItems: "center", paddingBottom: 25 }}>
+            <CustomInput rules={{ required: "This field is required." }} control={control} placeholder="full name" name="fullname" />
             <CustomInput rules={{ required: "This field is required." }} control={control} placeholder="username" name="username" />
             <CustomInput rules={{
                 required: "This field is required.", pattern: {

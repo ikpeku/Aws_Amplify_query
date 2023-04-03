@@ -1,26 +1,48 @@
-import { useCallback, useState } from "react"
-import { ScrollView, Text, View } from 'react-native'
+import { useCallback } from "react"
+import { Alert, ScrollView, Text, View } from 'react-native'
 import { CustomButton, CustomInput } from '../components'
 import { useRouter } from "expo-router"
 import { styles } from "./signin"
+import { useForm } from "react-hook-form"
+import { Auth } from "aws-amplify"
+
 
 const ConfirmSignUp = () => {
-
-
-    const [userName, setUserName] = useState("")
-    const [confirmCode, setConfirmCode] = useState("")
-
-
     const route = useRouter()
+    const { handleSubmit, control, watch } = useForm({
+        defaultValues: {
+            userName: route?.params?.username,
+            confirmCode: ""
+        }
+    })
 
-    const onConfirmPressed = useCallback(async () => {
-        console.warn("confirm")
+    console.log(route.params.username)
+
+    const user = watch("userName")
+
+
+
+
+
+    const onConfirmPressed = useCallback(async (data) => {
+        try {
+            await Auth.confirmSignUp(data.userName, data.confirmCode)
+            route.push("/")
+        } catch (error) {
+            Alert.alert("error")
+        }
     }, [])
 
 
 
     const handleCodeResendPressed = useCallback(async () => {
-        console.warn("forget password")
+        try {
+            await Auth.resendSignUp(user)
+            Alert.alert("Code resend")
+        } catch (error) {
+            Alert.alert("error")
+
+        }
     }, [])
 
     const handleSignInPressed = useCallback(async () => {
@@ -32,19 +54,24 @@ const ConfirmSignUp = () => {
 
     return (
         <ScrollView style={styles.root} contentContainerStyle={{ alignItems: "center", paddingBottom: 25 }}>
-            <Text>Username*</Text>
-            <CustomInput placeholder="enter email" value={userName} setValue={setUserName} />
+            <Text style={{ alignSelf: "stretch" }}>Username*</Text>
+            <CustomInput placeholder="enter username" name="userName" control={control} rules={{ required: "required" }} />
 
-            <Text>Confirmation Code*</Text>
-            <CustomInput placeholder="enter code" value={confirmCode} setValue={setConfirmCode} />
+            <Text style={{ alignSelf: "stretch" }}>Confirmation Code*</Text>
+            <CustomInput placeholder="enter code" name="confirmCode" control={control} rules={{ required: "required" }} />
 
-            <CustomButton title="Confirm" onPress={onConfirmPressed} />
+            <CustomButton title="Confirm" onPress={handleSubmit(onConfirmPressed)} />
 
 
-            <View style={{ flexDirection: "row" }}>
-                <CustomButton title="Resend code" onPress={handleCodeResendPressed} type="Tertiary" />
+            <View style={{ flexDirection: "row", gap: 20 }}>
 
-                <CustomButton title="Back to sign in" onPress={handleSignInPressed} bg="white" fc="#000" />
+                <View>
+                    <CustomButton title="Resend code" onPress={handleCodeResendPressed} type="Tertiary" />
+                </View>
+
+                <View>
+                    <CustomButton title="Back to sign in" onPress={handleSignInPressed} bg="white" fc="#000" />
+                </View>
             </View>
 
         </ScrollView>

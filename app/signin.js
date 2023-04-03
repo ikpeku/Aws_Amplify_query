@@ -1,12 +1,14 @@
-import { useCallback } from "react"
-import { StyleSheet, Image, useWindowDimensions, ScrollView, TextInput } from 'react-native'
+import { useCallback, useState } from "react"
+import { StyleSheet, Image, useWindowDimensions, ScrollView, TextInput, Alert } from 'react-native'
 import { CustomButton, CustomInput } from '../components'
 import { useRouter } from "expo-router"
 import SocialBtns from "../components/SocialBtns"
 import { useForm } from "react-hook-form";
+import { Auth } from "aws-amplify"
 
 const Home = () => {
     const { height } = useWindowDimensions()
+    const [isDisable, setIsDisable] = useState(false)
 
 
     const route = useRouter()
@@ -16,7 +18,22 @@ const Home = () => {
 
 
     const handleSignInWithEmailAndPasswordPressed = useCallback(async (data) => {
-        console.log(data)
+        setIsDisable(true)
+
+
+        try {
+            await Auth.signIn({ username: data.username, password: data.password })
+
+            setIsDisable(false)
+
+        } catch (error) {
+            setIsDisable(false)
+            Alert.alert("invalid credentials")
+
+        }
+
+        console.log(response)
+
     }, [])
 
     const handleForgetPasswordPressed = useCallback(async () => {
@@ -36,16 +53,13 @@ const Home = () => {
 
 
             <CustomInput rules={{
-                required: 'Enter your e-mail',
-                pattern: {
-                    value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$/i,
-                    message: 'Enter a valid e-mail address',
-                }
-            }} placeholder="enter email" name="email" secureTextEntry={false} control={control} />
+                required: 'username required',
+
+            }} placeholder="enter your username" name="username" secureTextEntry={false} control={control} />
             <CustomInput rules={{ required: "password is required", minLength: { value: 3, message: "Password length should be more than three", max: { value: 6, message: "too much" } } }} placeholder="enter password" name="password" secureTextEntry={true} control={control} />
 
 
-            <CustomButton title="Log in" onPress={handleSubmit(handleSignInWithEmailAndPasswordPressed)} />
+            <CustomButton disabled={isDisable} title="Log in" onPress={handleSubmit(handleSignInWithEmailAndPasswordPressed)} />
             <CustomButton title="Forget Password" onPress={handleForgetPasswordPressed} type="Tertiary" />
 
             <SocialBtns />

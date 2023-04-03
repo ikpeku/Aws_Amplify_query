@@ -10,13 +10,11 @@ const CustomInput = ({placeholder, rules={}, secureTextEntry=false, control, nam
 
       <Controller rules={rules} name={name} control={control} render={({ field: { onBlur, onChange, value }, fieldState: {error} , }) => (
         <>
-       <View style={styles.root}>
+       <View style={[styles.root, { borderColor: error ? "red" : "#e8e8e8",}]}>
           <TextInput style={styles.input} placeholder={placeholder} value={value} onChangeText={onChange} onBlur={onBlur} secureTextEntry={secureTextEntry} />
         </View>
         {error && <Text style={{alignSelf: "stretch", paddingHorizontal: 10, color: "red"}}>{ error.message || "Error"}</Text>}
         </>
-       
-
             )} />
      </>
   )
@@ -29,7 +27,7 @@ const styles = StyleSheet.create({
         width: "100%",
         backgroundColor: "#fff",
         borderWidth: 1,
-        borderColor: "#e8e8e8",
+       
         borderRadius: 10,
         marginVertical: 5,
         paddingHorizontal: 20,
